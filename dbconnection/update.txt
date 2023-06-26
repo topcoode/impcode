@@ -1,0 +1,4 @@
+// update
+updateStmt := `update "Students" set "Name"=$1, "Roll_Number"=$2 where "id"=$3`
+_, e := db.Exec(updateStmt, "Rachel", 24, 8)
+CheckError(e)

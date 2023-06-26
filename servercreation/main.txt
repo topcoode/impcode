@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>UI</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+  <script>
+  
+	function testData() {
+	
+		  $.ajax({url: "/hello", data: {name2:document.getElementById("txtName").value}, success: function(result){
+			$("#div1").html(result);
+		  }});
+			
+			return false;
+	}
+  
+  
+	function formData() {
+	
+		  $.ajax({url: "/", data: {context:document.getElementById("txtName").value}, success: function(result){
+			$("#div1").html(result);
+		  }});
+			
+			return false;
+	}
+	
+	
+  </script>
+</head>
+<body class="mat-typography">
+    <h1>USER INTERFACE</h1>
+	<form>
+    <table>
+    <tr>
+        <td> Name </td>
+        <td> :  </td>
+        <td> <input id="txtName"> </td>
+        </tr>
+     <tr>
+        <td> Company Name </td>
+         <td> : </td>
+         <td id="div1"><input > </td>
+     </tr>
+    </table>
+    <br>
+	
+	<form method=post>
+		<table style="padding-left: 120px;">
+			 <tr >
+				<td>
+					  
+					  <input type="submit" value="Submit" onclick="return testData()">
+					  <input type="reset" value="Reset">
+					   <input type="submit" value="Context" onclick="return formData()">
+				 </td>
+			</tr>
+		</table>
+	</form>
+</form>
+</body>
+</body>
+</html>

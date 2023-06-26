@@ -1,0 +1,122 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+)
+
+type MyStruct struct {
+	id            string
+	nfInstanceId  string
+	nfType        string
+	plmnList      plmnList      //`json:"plmnList      "`
+	ipv4Addresses ipv4Addresses //`json:"ipv4Addresses"`
+	nfServices    nfServices    //`json:"nfServices    "`
+	versions      []versions    //`json:"versions      "`
+}
+type plmnList struct {
+	mcc string
+	mnc string
+}
+type ipv4Addresses struct {
+	IPADDRESS string
+}
+type nfServices struct {
+	serviceInstanceId string
+	serviceName       string
+}
+type versions struct {
+	apiVersionInUri string
+	apiFullVersion  string
+}
+
+// ------------------------------>
+type schema struct {
+	scheme          string
+	nfServiceStatus string
+	ipEndPoints     ipEndPoints
+}
+type ipEndPoints struct {
+	ipv4Address string
+	port        string
+}
+
+func main() {
+	ms := `{id: "imsi", nfInstanceId: "nfinstanceID", nfType: "datatype",
+		plmnList{mcc: "mcc", mnc: "mnc"},
+		ipv4Addresses{IPADDRESS: "ipadresss"},
+	nfServices{serviceInstanceId: "number", serviceName: "number"},
+		[]versions{{apiVersionInUri: "apiuri", apiFullVersion: "version"},
+			{apiVersionInUri: "uri", apiFullVersion: "version"}},
+	}`
+	/*
+		ms := MyStruct{"imsi", "nfinstanceID", "datatype",
+			plmnList:      plmnList{"mcc", "mnc"},
+			ipv4Addresses: ipv4Addresses{"ipadresss"},
+			nfServices:    nfServices{"number", "number"},
+			versions: []versions{{"apiuri", "version"},
+				{"uri", "version"}},
+		}*/
+
+	vs := &schema{scheme: "http", nfServiceStatus: "register", ipEndPoints: ipEndPoints{
+		ipv4Address: "ipaddress", port: "port",
+	},
+	}
+
+	fmt.Println(ms)
+	jsondata, err := json.MarshalIndent(ms, "", "")
+	if err != nil {
+		fmt.Println("error---------->", err)
+	}
+	fmt.Println(string(jsondata))
+	jsondata2, err := json.MarshalIndent(vs, "", "")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(jsondata2))
+
+}
+
+// {
+//  "_id" : ObjectId("6433fbeceb1c810798d384e5"),
+// "nfInstanceId" : "a38d8346-9f28-48c2-9e65-ff325c37ausf",
+// 	 "nfType" : "AUSF",
+// 	 "nfStatus" : "REGISTERED",
+// 	 "plmnList" : [
+// 	 {
+// 	 "mcc" : "208",
+// 	 "mnc" : "93"
+// 	 },
+// 	 {
+// 	 "mcc" : "123",
+// 	 "mnc" : "45"
+// 	 }
+// 	 ],
+// 	 "ipv4Addresses" : [
+// 	 "192.168.149.72"
+// 	 ],
+// 	 "ausfInfo" : {
+// 	 "groupId" : "ausfGroup001"
+// 	 },
+// 	 "nfServices" : [
+// 	 {
+// 	 "serviceInstanceId" : "a38d8346-9f28-48c2-9e65-ff325c37ausf",
+// 	 "serviceName" : "nausf-auth",
+// 	 "versions" : [
+// 	 {
+// 	 "apiVersionInUri" : "v1",
+// 	 "apiFullVersion" : "1.0.0"
+// 	 }
+// 	 ],
+//----------------------------------------------->
+// 	 "scheme" : "http",
+// 	 "nfServiceStatus" : "REGISTERED",
+// 	 "ipEndPoints" : [
+// 	 {
+// 	 "ipv4Address" : "192.168.149.72",
+// 	 "port" : 8006
+// 	 }
+// 	 ]
+// 	 }
+// 	 ]
+// 	}

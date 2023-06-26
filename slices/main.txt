@@ -1,0 +1,54 @@
+package main
+
+import (
+	"fmt"
+)
+
+func main() {
+	//slices
+	var god = []string{"krishna", "hanuman", "vekateshwara"}
+	fmt.Printf("the god are: %v \n", god)
+	// append():::::::::::
+	// adding data in slices
+	god = append(god, "deva", "matha")
+	fmt.Println("the new gods are:\n ", god)
+	// [1:]
+	// index :0,1,2,,3,4....
+	//[krishna hanuman vekateshwara deva matha]
+	god = append(god[1:5])
+	fmt.Println(god)
+	//[hanuman vekateshwara deva matha]
+	god = append(god[0:5])
+	fmt.Println(god)
+	// [hanuman vekateshwara deva matha
+	// make:::::::::::: slices
+	devil := make([]string, 4)
+	devil[0] = "raj"
+	devil[0] = "boiu"
+	devil[0] = "tim"
+	devil[0] = "sai"
+	fmt.Println(devil)
+	// [sai   ]
+	evil := make([]string, 5)
+	evil[0] = "raj"
+	evil[1] = "boiu"
+	evil[2] = "tim"
+	evil[3] = "sai"
+	fmt.Println(evil)
+	// [raj boiu tim sai ]
+	// package sort
+	// sort.(evil)
+	// fmt.Println(evil)
+
+	// .......................................................................................
+	// remove values frm slices  (based on)using index
+	var colleges = []string{"vdc", "cdc", "mjit", "ldc", "kdc"}
+	fmt.Println(colleges)
+	var index int = 2
+	//colleges = append(colleges[index+1:])
+
+	// [ldc kdc]
+	colleges = append(colleges[:index+1])
+	fmt.Println(colleges)
+	// [vdc cdc mjit]
+}

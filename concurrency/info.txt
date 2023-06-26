@@ -1,0 +1,7 @@
+*Concurrency is an ability of a program to do multiple things at the same time.
+*Concurrency in Golang is the ability for functions to run independently of each other. 
+Parallelism is a run-time property where two or more tasks are being executed simultaneously.
+ Through concurrency, you want to define a proper structure for your program. 
+ * Concurrency can use parallelism for getting its job done but remember parallelism
+  is not the ultimate goal of concurrency.
+  Go has rich support for concurrency using goroutines and channels.

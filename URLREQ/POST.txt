@@ -1,0 +1,165 @@
+__________________________________Sending a POST Request_______________________________________________________
+In a REST API, a GET request is only used for retrieving information from the server,
+ so for your program to fully participate in a REST API, your program also needs to support sending POST requests.
+  A POST request is almost the inverse of a GET request,
+ where the client sends data to the server in the request’s body.
+
+In this section, you will update your program to send your request as a POST request instead of a GET request.
+ Your POST request will include a request body,
+  and you will update your server to print out more information about the requests you’re making from the client.
+  ...
+
+import (
+	"bytes"
+	"errors"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"os"
+	"strings"
+	"time"
+)
+
+...
+...
+  mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	  fmt.Printf("server: %s /\n", r.Method)
+	  fmt.Printf("server: query id: %s\n", r.URL.Query().Get("id"))
+	  fmt.Printf("server: content-type: %s\n", r.Header.Get("content-type"))
+	  fmt.Printf("server: headers:\n")
+	  for headerName, headerValue := range r.Header {
+		  fmt.Printf("\t%s = %s\n", headerName, strings.Join(headerValue, ", "))
+	  }
+
+	  reqBody, err := ioutil.ReadAll(r.Body)
+	  if err != nil {
+			 fmt.Printf("server: could not read request body: %s\n", err)
+	  }
+	  fmt.Printf("server: request body: %s\n", reqBody)
+
+	  fmt.Fprintf(w, `{"message": "hello!"}`)
+  })
+............................................................................................................
+In this update to the server’s HTTP request handler,
+you add a few more helpful fmt.Printf statements to see information about the request coming in.
+You use r.URL.Query().Get to get a query string value named id, and r.Header.Get to get the value of a header called content-type.
+You also use a for loop with r.Header to print the name and value of each HTTP header the server received. 
+This information can be useful for troubleshooting issues if your client or server isn’t acting the way you expect. 
+Finally,
+ you also used the ioutil.ReadAll function to read the HTTP request’s body in r.Body.
+ ............................................................................................................
+ After updating the server handler function, 
+ update the main function’s request code so that it’s sending a POST request with a request body:
+ ............................................................................................................
+ ...
+ time.Sleep(100 * time.Millisecond)
+	
+ jsonBody := []byte(`{"client_message": "hello, server!"}`)
+ bodyReader := bytes.NewReader(jsonBody)
+
+ requestURL := fmt.Sprintf("http://localhost:%d?id=1234", serverPort)
+ req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
+.............................................................................................................
+In your update to the main function’s request,
+ one of the new values you’re defining is the jsonBody value.
+  In this example, the value is represented as a []byte instead of the standard string because
+   if you use the encoding/json package to encode JSON data, it will give you a []byte back instead of a string.
+
+The next value, the bodyReader,
+ is a bytes.Reader that wraps the jsonBody data.
+  An http.Request body requires the value to be an io.Reader, 
+  and jsonBody’s []byte value doesn’t implement io.Reader, 
+  so you wouldn’t be able to use it as a request body on its own.
+   The bytes.Reader value exists to provide that io.Reader interface,
+    so you can use the jsonBody value as the request body.
+
+The requestURL value is also updated to include an id=1234 query string value,
+ primarily to show how a query string value can also be included
+  in the request URL along with other standard URL components.
+
+Finally, the http.NewRequest function call is updated to use a POST method with http.MethodPost,
+ and the request body is included by updating the last parameter from a nil body to bodyReader,
+  the JSON data io.Reader.
+  --------------------------------------------------------------------------------------------------------
+  .....................................
+అనుకూలీకరించడం(((((((((((((Customizing an HTTP Request)))))))))))))
+...
+
+_______________________________________________________________________________________________
+What is Content-Type in headers?
+The Content-Type header is used to indicate the media type of the resource. 
+The media type is a string sent along with the file indicating the format of the file.
+ For example, for image file its media type will be like image/png or image/jpg, etc. 
+ In response, it tells about the type of returned content, to the client.
+ __________________________________________________________________________________________________
+ Over time, HTTP requests and responses have been used to send a greater variety of data between
+  clients and servers.
+   At one point, HTTP clients could assume the data they’re receiving from
+    an HTTP server is HTML and have a good chance of being correct.
+	 Now, though, it could be HTML, JSON, music, video, or any number of other data types.
+	  To provide more information about the data being sent over HTTP,
+	  the protocol includes HTTP headers, and one of those important headers is the Content-Type header.
+	   This header tells the server (or client, depending on the direction of the data) how to interpret the data it’s receiving.
+
+In this section, 
+you will update your program to set the Content-Type header on your HTTP request so the server
+ knows it’s receiving JSON data. 
+ You will also update your program to use an HTTP client other than Go’s default
+  http.DefaultClient so that you can customize how the request is sent.
+  _________________________________________________________________
+  req, err := http.NewRequest(http.MethodPost, requestURL, bodyReader)
+  if err != nil {
+		 fmt.Printf("client: could not create request: %s\n", err)
+		 os.Exit(1)
+  }
+  req.Header.Set("Content-Type", "application/json")
+
+  client := http.Client{
+	 Timeout: 30 * time.Second,
+  }
+
+  res, err := client.Do(req)
+  if err != nil {
+	  fmt.Printf("client: error making http request: %s\n", err)
+	  os.Exit(1)
+  }
+
+........................................................................................................
+In this update, you access the http.Request headers using req.Header,
+and then set the value of the Content-Type header on the request to application/json.
+The application/json media type is defined in the list of media types as the media type for JSON.
+This way, when the server receives your request, it knows to interpret the body as JSON and not,
+for example, XML.
+
+The next update is to create your own http.Client instance in the client variable.
+In this client, you set the Timeout value to 30 seconds.
+This is important because it says that any requests made with the client will give up and
+stop trying to receive a response after 30 seconds. 
+Go’s default http.DefaultClient doesn’t specify a timeout,
+so if you make a request using that client, it will wait until it receives a response,
+is disconnected by the server, or your program ends. If you have many requests hanging
+around like this waiting for a response, you could be using a large number of resources
+on your computer. Setting a Timeout value limits how long a request will wait by the time
+you define.
+
+Finally, you updated your request to use the Do method of your client variable.
+You don’t need to make any other changes here because you’ve been calling 
+Do on an http.Client value the whole time. Go’s default HTTP client, http.DefaultClient,
+is just an http.Client that’s created by default. So, when you called http.Get,
+the function was calling the Do method for you, and when you updated your request
+to use http.DefaultClient, you were using that http.Client directly. 
+The only difference now is that you created the http.Client value you’re using this time.
+_______________________________________________________________________________________________
+output
+server: POST /
+server: query id: 1234
+server: content-type: application/json
+server: headers:
+        Accept-Encoding = gzip
+        User-Agent = Go-http-client/1.1
+        Content-Length = 36
+        Content-Type = application/json
+server: request body: {"client_message": "hello, server!"}
+client: got response!
+client: status code: 200
+client: response body: {"message": "hello!"}

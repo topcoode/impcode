@@ -1,0 +1,45 @@
+func retrieveRecord(w http.ResponseWriter, r *http.Request) {
+
+// checks if the request is a "GET" request
+if r.Method != "GET" {
+http.Error(w, http.StatusText(405), http.StatusMethodNotAllowed)
+return
+}
+
+// We assign the result to 'rows'
+rowsRs, err := db.Query("SELECT * FROM Students")
+
+if err != nil {
+http.Error(w, http.StatusText(500), http.StatusInternalServerError)
+return
+}
+defer rowsRs.Close()
+
+
+// creates placeholder of the sandbox
+snbs := make([]sandbox, 0)
+
+
+// we loop through the values of rows
+for rows.Next() {
+snb := sandbox{}
+err := rowsRs.Scan(&snb.name, &snb.roll_number)
+if err != nil {
+log.Println(err)
+http.Error(w, http.StatusText(500), 500)
+return
+}
+snbs = append(snbs, snb)
+}
+
+if err = rowsRs.Err(); err != nil {
+http.Error(w, http.StatusText(500), 500)
+return
+}
+
+// loop and display the result in the browser
+for _, snb := range snbs {
+fmt.Fprintf(w, "%d %s %s %d\n", snb.name, snb.roll_number)
+}
+
+}

@@ -1,0 +1,222 @@
+
+A struct is an aggregate type where we can group multiple arbitrary types of elements as a single entity. The idea is not very different (unless we use an interface{}) from the struct that we use in C/C++. Each element declared within the struct is called a field. Imagine a database record where we may want to work with an entity such as Book. The Book entity typically consists of fields such as ISBN number, title, edition, publisher, price, category, and so on. Using structs, what we can do is create a single unit such as an entity consisting of multiple fields whose types are different from one another. We can then use this single unit in a variety of ways. For example, we can create an array of this entity and store multiple Book data points or create a single instance of it, among other possibilities.
+
+Here is how we declare a struct Book and create one or more instances of this unit.
+
+
+type Book struct {
+	ISBN 		string
+	Title		string
+	Edition 	string
+	Publisher	string
+	Price		float
+	Author	string	
+}
+Note that fields are typically written one per line. However we can also combine fields of the same type as follows:
+
+
+type Book struct {
+	ISBN, Title, Edition, Publisher, Author string
+	Price	float
+}
+To create an instance of the struct type Book we may write as follows:
+
+
+var b1, b2, b3 Book
+var b5 Book
+We also can create a pointer and assign a struct reference or use a new() function to create a struct reference dynamically and assign the value to a pointer variable, as in this example:
+
+
+var bkPtrRef *Book
+bkPtrRef = &b1
+
+//using new() function
+var bkPtr *Book
+bkPtr = new(Book)
+The individual field in the struct can be accessed using the dot(.) operator:
+
+
+b1. id = 101
+Unlike C/C++ where we may use the (arrow)-> operator or dereference operator(*.) with the pointer, in Go we can simply use the dot(.) operator with a pointer to struct in much the same way we access through a struct instance.
+
+
+// struct instance
+var b1 Book
+b1.ISBN = "8170283701"
+b1.Title = "Mission to Moon"
+b1.Edition = "2015"
+b1.Publisher = "ABC Publisher"
+b1.Price = 140.00
+b1.Author = "donald"
+
+//struct pointer
+var ptr *Book = new(Book)
+ptr.ISBN = "8170287723"
+ptr.Title = "Mission to Mars"
+ptr.Edition = "2013"
+ptr.Publisher = "ABC Publisher"
+ptr.Price = 160.00
+ptr.Author = "mickey"
+A struct example in Go
+Here is a very simple example to show how we can create a singly linked list using structs. It is actually a copy of one of my C code creations and I made a few changes to make it work in Go just to see how simple it is to switch from C to Go.
+
+
+package main
+
+import (
+	"fmt"
+)
+
+type Node struct {
+	info int
+	next *Node
+}
+
+func makeNode(val int) *Node {
+	var p *Node
+	p = new(Node)
+	p.info = val
+	p.next = nil
+	return p
+}
+
+func makeList(root *Node) *Node {
+	var num int
+	var ptr *Node
+	ptr = nil
+	for {
+		fmt.Print("Enter a value (-999) to stop: ")
+		fmt.Scanf("%d", &num)
+		if num == -999 {
+			break
+		}
+		if root == nil {
+			root = makeNode(num)
+			ptr = root
+		} else {
+			ptr.next = makeNode(num)
+			ptr = ptr.next
+		}
+	}
+	return root
+}
+
+func printList(p *Node) {
+	for ; p != nil; p = p.next {
+		fmt.Printf("->%d", p.info)
+	}
+}
+
+func main() {
+	var root *Node = nul
+	root = makeList(root)
+	printList(root)
+}
+Output
+
+
+Enter a value (-999) to stop: 11
+Enter a value (-999) to stop: 22
+Enter a value (-999) to stop: 33
+Enter a value (-999) to stop: 44
+Enter a value (-999) to stop: 55
+Enter a value (-999) to stop: 66
+Enter a value (-999) to stop: -999
+->11->22->33->44->55->66
+Slice of structs
+We can create a slice of structs. The following example illustrates how the items variable is declared as a slice of struct type. Notice that the struct declared here is unnamed but we can access it via the field name and not use index values as we typically do with a slice. The advantage of using a struct is that we can use different data types for the fields, which simply is not possible with a plain slice.
+
+
+items := []struct {
+	name     string
+	quantity int
+	price    float64
+}{{"PRT34", 5, 5.67}, {"XZE77", 6, 9.67}, {}, {"URT63", 6, 3.35}, {"LKJ98", 4, 4.36}, {"NHT45", 2, 8.25}}
+
+for _, item := range items {
+	fmt.Printf("%s\t%d\t%v\n", item.name, item.quantity, item.price)
+}
+Note that the number fields as an empty item in the slice of struct is automatically initialized with 0 values.
+
+Embedding a slice within a struct
+We have seen how to access named variables within a struct. But what if we want to put a slice inside a struct construct? Let us try an example by creating two structs as follows.
+
+
+type author struct {
+	Firstname string
+	Lastname  string
+	bio       string
+}
+type Book struct {
+	ISBN      string
+	Title     string
+	Edition   string
+	Publisher string
+	Authors   []author
+	Price     float64
+}
+
+authors := []author{{"AA", "BB", "a sample bio of AA"},
+		{"CC", "DD", "a sample bio of CC"},
+		{"EE", "FF", "a sample bio of EE"}}
+
+b1 := Book{"12345678", "Title1", "2015", "xyz publisher", authors, 140.60}
+
+fmt.Println(b1)
+Observe that the Authors in the Book struct is a slice of the author struct. We first create a slice of author, populate all the fields in the order and then set the Authors field with the created author slice and finally print it (as illustrated in the above code sample).
+
+Comparing structs
+One of the common needs for any type is comparability. In Go, struct is also comparable provided the fields declared inside the struct are comparable using the common comparison operator == and !=. Here is an example.
+
+
+type item struct {
+	qty   int
+	price float64
+	name  string
+}
+
+it1 := item{5, 6.56, "aa"}
+it2 := item{6, 5.56, "aa"}
+it3 := item{5, 6.56, "aa"}
+fmt.Println(it1 == it2) 	//false
+fmt.Println(it1 == it3)		//true
+What if another struct type is embedded in a struct; does the comparison work? It still works, as in this example.
+
+
+type qty struct {
+	val int
+}
+
+type price struct {
+	val float64
+}
+
+type item struct {
+	quantity qty
+	amount   price
+	name     string
+}
+
+var it1 item
+it1.quantity.val = 10
+it1.amount.val = 4.56
+it1.name = "AA"
+
+var it2 item
+it2.quantity.val = 10
+it2.amount.val = 5.56
+it2.name = "AA"
+
+fmt.Println(it1 == it2) //false
+Anonymous fields
+In Go we can declare anonymous fields inside a struct. These are no-name fields, but the type of the field must be of a named type or a pointer to a named type. Here is an example.
+
+
+type item struct {
+	qty
+	price
+	name string
+}
+
+it1 := item{qty{10}, price{5.56}, "AA"}
+Note that anonymous fields have implicit names. We cannot declare more than one anonymous field, otherwise the implicit name would conflict.

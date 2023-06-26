@@ -1,0 +1,222 @@
+When a program needs to communicate with another program, many developers will use HTTP.
+ One of Go’s strengths is the breadth of its standard library, and HTTP is no exception.
+ The Go net/http package not only supports creating HTTP servers, but it can also make HTTP requests as a client
+----------------------------------------------------------------------------------------------------------------------------------
+ you will create a program that makes several types of HTTP requests to an HTTP server
+ --------------------------------------------------------------------------------------------------------------------------------------
+ In the main.go file, you will create two functions, getRoot and getHello, to act as your handler functions.
+  Then, you’ll create a main function and use it to set up your request handlers with the http.HandleFunc function
+   by passing it. the / path for the getRoot handler function and the /hello path for the getHello handler function.
+  Once you’ve set up your handlers, call the http.ListenAndServe function to start the server and listen for requests.
+
+
+  package main
+import (
+	"errors"
+	"fmt"
+	"io"
+	"net/http"
+	"os"
+)
+
+func getRoot(w http.ResponseWriter, r *http.Request) {    //handler function
+	fmt.Printf("got / request\n")
+	io.WriteString(w, "This is my website!\n")
+}
+func getHello(w http.ResponseWriter, r *http.Request) {   //handler function
+	fmt.Printf("got /hello request\n")
+	io.WriteString(w, "Hello, HTTP!\n")
+}
+func main(){
+
+ http.HandleFunc()                                                                     --------------- -////////// to handle the function
+  call the (((((((((((((((((((http.ListenAndServe))))))))))))))))))))))))) function                 ///////////For Runingserver 
+  to start the ((((((((((((server))))))))))) and listen for requests.
+
+}
+----------------------------------------------------------------------------------------------------------------------
+In this first chunk(bhaggam) of code,
+you set up the package for your Go program, 
+import the required packages for your program,
+and create two functions: the {{getRoot function}} and the {{{getHello function.}}}} 
+Both of these functions have the same function signature,_________-- 
+where they accept the same arguments: an ||||||||||http.ResponseWriter||||||||||||||||| value and an ||||||||||*http.Request value.|||||||||||||||
+This function signature is used for HTTP handler functions and is defined as http.HandlerFunc.
+When a request is made to the [[server]], it sets up these two values with information 
+about the request being made and then calls the handler function with those values.
+--------------------------------------------------------------------------------------------------------------------
+ IMPORTANT:   In an http.HandlerFunc, the http.ResponseWriter value 
+ (named w in your handlers) is used to control
+the response information being written back to the client that made the request,
+such as the body of the response or the status code. Then,
+the *http.Request value (named r in your handlers) is used to get information about
+ the request that came into the server,
+such as the body being sent in the case of a POST request or information about the client
+ that made the request.
+------------------------------------------------------------------------------------------------------------------
+ ...
+func main() {
+http.HandleFunc("/", getRoot)
+http.HandleFunc("/hello", getHello)
+err := http.ListenAndServe(":3333", nil)-------------------------------------------------------------{
+...
+--------In the main function, you have two calls to the http.HandleFunc function. 
+Each call to the function sets up a handler function for a specific request path in the default server multiplexer
+--------The server multiplexer is an http.Handler that is able to look at a request path and
+call a given handler function associated with that path
+------In the main function,"""""""""" you have two calls to the http.HandleFunc function"""""""""".
+Each call to the function sets up a """""""""handler function""""""""" for a specific request path in the default server multiplexer.
+The server multiplexer is an http.Handler that is able to look at a request path and call a given handler function associated with that path.
+So, in your program, you’re telling the default server multiplexer to call the getRoot function when someone requests the / path and the getHello function when someone requests the /hello path.
+
+--Once the handlers are set up, you call the http.ListenAndServe function, 
+which tells the global HTTP server to listen for incoming requests on a specific port with an optional http.Handler. 
+In your program, you tell the server to listen on ":3333". By not specifying an IP address before the colon,
+the server will listen on every IP address associated with your computer, 
+and it will listen on port 3333.
+A network port, such as 3333 here, is a way for one computer to have many programs communicating with each other at the same time.
+Each program uses its own port, so when a client connects to a specific port the computer knows which program to send it to.
+If you wanted to only allow connections to localhost, the hostname for IP address 127.0.0.1, you could instead say 127.0.0.1:3333.
+
+Your http.ListenAndServe function also passes a nil value for the http.Handler parameter.
+ This tells the ListenAndServe function that you want to use the default server multiplexer and not the one you’ve set up.
+
+The ListenAndServe is a blocking call, which means your program won’t continue running until after ListenAndServe finishes running.
+ However, ListenAndServe won’t finish running until your program finishes running or the HTTP server is told to shut down.
+  Even though ListenAndServe is blocking and your program doesn’t include a way to shut down the server,
+   it’s still important to include error handling because there are a few ways calling ListenAndServe can fail.
+    So, add error handling to your ListenAndServe in the main function as shown:
+    ...
+
+func main() {
+	...-------------------------------------------------------------}
+	err := http.ListenAndServe(":3333", nil)
+  if errors.Is(err, http.ErrServerClosed) {
+		fmt.Printf("server closed\n")
+	} else if err != nil {
+		fmt.Printf("error starting server: %s\n", err)
+		os.Exit(1)
+	<^>}
+}
+______------------------------------------------------------------Running Multiple Servers at One Time--------------------------------------------------------------------
+package main
+
+import (
+	// Note: Also remove the 'os' import.
+	"context"
+	"errors"
+	"fmt"
+	"io"
+	"net"
+	"net/http"
+)
+
+const keyServerAddr = "serverAddr"
+
+func getRoot(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	fmt.Printf("%s: got / request\n", ctx.Value(keyServerAddr))                -----------------------------two functions are written
+	io.WriteString(w, "This is my website!\n")
+}
+func getHello(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	fmt.Printf("%s: got /hello request\n", ctx.Value(keyServerAddr))
+	io.WriteString(w, "Hello, HTTP!\n")
+}
+----------------------------------------
+...
+func main() {
+	...
+	mux.HandleFunc("/hello", getHello)
+
+	ctx, cancelCtx := context.WithCancel(context.Background())
+	serverOne := &http.Server{
+		Addr:    ":3333",                                                      ---------------------------------handling/////
+		Handler: mux,
+		BaseContext: func(l net.Listener) context.Context {
+			ctx = context.WithValue(ctx, keyServerAddr, l.Addr().String())
+			return ctx
+		},
+	}
+    ---------------------------------------------------
+    ...
+
+func main() {
+	...
+	serverTwo := &http.Server {
+		...
+	}
+
+	go func() {
+		err := serverOne.ListenAndServe()
+		if errors.Is(err, http.ErrServerClosed) {
+			fmt.Printf("server one closed\n")
+		} else if err != nil {
+			fmt.Printf("error listening for server one: %s\n", err)
+		}
+		cancelCtx()
+	}()
+    ----------------------------------------------
+    ...
+
+func main() {
+	...
+	go func() {
+		...
+	}()
+	go func() {
+		err := serverTwo.ListenAndServe()
+		if errors.Is(err, http.ErrServerClosed) {
+			fmt.Printf("server two closed\n")
+		} else if err != nil {
+			fmt.Printf("error listening for server two: %s\n", err)
+		}
+		cancelCtx()
+	}()
+
+	<-ctx.Done()
+}
+_________________________________________________________________________________________________
+------------------------------------------------------------------------------------Inspecting a Request’s Query String-------------------------------------------
+...
+
+func getRoot(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	hasFirst := r.URL.Query().Has("first")
+	first := r.URL.Query().Get("first")
+	hasSecond := r.URL.Query().Has("second")
+	second := r.URL.Query().Get("second")
+
+	fmt.Printf("%s: got / request. first(%t)=%s, second(%t)=%s\n",
+		ctx.Value(keyServerAddr),
+		hasFirst, first,
+		hasSecond, second)
+	io.WriteString(w, "This is my website!\n")
+}
+...
+...
+
+func main() {
+	...
+	mux.HandleFunc("/hello", getHello)
+	
+	ctx := context.Background()
+	server := &http.Server{
+		Addr:    ":3333",
+		Handler: mux,
+		BaseContext: func(l net.Listener) context.Context {
+			ctx = context.WithValue(ctx, keyServerAddr, l.Addr().String())
+			return ctx
+		},
+	}
+
+	err := server.ListenAndServe()
+	if errors.Is(err, http.ErrServerClosed) {
+		fmt.Printf("server closed\n")
+	} else if err != nil {
+		fmt.Printf("error listening for server: %s\n", err)
+	}
+}

@@ -1,0 +1,57 @@
+// Keys = values
+package main
+
+import "fmt"
+
+func main() {
+	oops := map[int]string{
+		01: "string",
+		02: " object",
+		03: "jj",
+	}
+	fmt.Println(oops)
+	// retrieve a value related to a key in the maps
+	// map_name[key]
+	value1 := oops[01]
+	fmt.Printf("%v", value1)
+	// check the existence of the key in the map
+	// With value
+	// It will gives the value and check result
+	// value, check_variable_name:= map_name[key]
+	// or
+	// Without value using the blank identifier
+	// It will only give check result
+	// _, check_variable_name:= map_name[key]
+	A, B := oops[01]
+	fmt.Println("\nKey present or not:", A)
+	fmt.Println("Value:", B)
+	// delete key from the map
+	// delete(map_name, key)
+	delete(oops, 01)
+	fmt.Println(oops)
+	// Modifying map
+	newoops := oops
+	newoops[04] = "polymorphism"
+	newoops[05] = "goldism"
+	fmt.Println(newoops)
+	iterate()
+}
+func iterate() {
+
+	// Creating and initializing a map
+	m_a_p := map[int]string{
+
+		90: "Dog",
+		91: "Cat",
+		92: "Cow",
+		93: "Bird",
+		94: "Rabbit",
+	}
+
+	// Iterating map using for rang loop
+	// id = 90,91,92,...,pet = dog,cat,cow,..
+	for id, pet := range m_a_p {
+
+		fmt.Println(id, pet)
+	}
+}

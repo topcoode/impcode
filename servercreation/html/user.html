@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>UI</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>  
+     table {
+            border: 2px solid grey;
+            width: 100%;
+            flex: auto;
+         }
+         table tr:nth-child(odd) {
+            background-color: #f2f2f2;
+         }
+         table tr:nth-child(even) {
+            background-color: #ffffff;
+           
+  }
+</style>
+		 <script>
+	function update() {
+	
+		  $.ajax({url: "/appuser/upd", success: function(result){
+			$("#div1").html(result);
+		  }});
+			
+			return false;
+	}
+
+  function adduser() {
+	
+  $.ajax({url: "/appuser/add", data: {name2:document.getElementById("txtName").value}, success: function(result){
+  $("#div1").html(result);
+  }});
+  
+  return false;
+}
+  
+  
+	// function delete() {
+	
+	// 	  $.ajax({url: "/appuser/del",success: function(result){
+	// 		$("#div1").html(result);
+	// 	  }});
+			
+	// 		return false;
+	// }
+  </script>
+</head>
+<body>
+            <div style="color:black;text-align: end;padding-right: 100px;">
+              <div onClick="document.getElementById('bottom').innerHTML=loadPage('newuser.html');">NEW</div><p>
+            </div>
+    
+            <div>
+              <form>
+                <table style="padding-left: 25%;padding-top: 10px;">
+                <tr>
+                    <td> UserName </td>
+                    <td> :  </td>
+                    <td> <input id="txtName"> </td>
+                    </tr>
+                    <br>
+                 <tr style="padding-top: 50px;">
+                    <td >Password </td>
+                     <td> : </td>
+                     <td id="txtName"><input > </td>
+                 </tr>
+                </table>
+                <br>
+                
+                <form method=post>
+                    <table style="padding-left: 35%;">
+                         <tr >
+                            <td>
+                                  
+                                  <input type="submit" value="Submit" onclick="return adduser()">
+                                  <input type="reset" value="Cancel">
+                             </td>
+                        </tr>
+                    </table>
+                </form>
+            </form>
+            </div>
+    
+        <div ng-view></div>
+            <br>
+        <table>
+          <tr>
+             <th>username</th>
+             <th>password</th>
+             <th style="text-align: end;"> Action</th>
+          </tr>
+          <tr style="text-align: center;">
+             <td>{{username}}</td>
+             <td> {{password}}</td>
+			 <td>
+			 <button onclick="return update()">update</button>
+            <button>Delete</button>
+			 </td>
+             <td style="text-align: end;"></td> 
+          </tr>
+       </table>
+	   <md-icon md-font-icon="classname"></md-icon>
+</body>
+</html>

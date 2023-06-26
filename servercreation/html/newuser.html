@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+	 <script>
+	function adduser() {
+	
+		  $.ajax({url: "/appuser/add", data: {name2:document.getElementById("txtName").value}, success: function(result){
+			$("#div1").html(result);
+		  }});
+			
+			return false;
+	}
+  </script>
+</head>
+<body>
+    <h1  style="padding-left: 35%;">USERS</h1>
+    <form>
+        <table style="padding-left: 25%;padding-top: 10px;">
+        <tr>
+            <td> UserName </td>
+            <td> :  </td>
+            <td> <input id="txtName"> </td>
+            </tr>
+            <br>
+         <tr style="padding-top: 50px;">
+            <td >Password </td>
+             <td> : </td>
+             <td id="txtName"><input > </td>
+         </tr>
+        </table>
+        <br>
+        
+        <form method=post>
+            <table style="padding-left: 35%;">
+                 <tr >
+                    <td>
+                          
+                          <input type="submit" value="Submit" onclick="return adduser()">
+                          <input type="reset" value="Cancel">
+                     </td>
+                </tr>
+            </table>
+        </form>
+    </form>
+
+    <div ng-view></div>
+</body>
+</html>

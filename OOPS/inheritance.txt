@@ -1,0 +1,4 @@
+When a class acquires the properties of its superclass then we can say it is inheritance.
+ Here, subclass/child class are the terms used for the class which acquire properties.
+  For this one, one must use a struct to achieve inheritance in Golang.
+ Here, users have to compose using structs to form the other objects.

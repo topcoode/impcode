@@ -1,0 +1,72 @@
+
+CREATE TABLE "accountstatus" (
+	"accountstatusid" SERIAL,
+	"accountstatusname" VARCHAR(20) NULL DEFAULT NULL,
+	"isactive" INTEGER NULL DEFAULT NULL
+)
+
+--Active,Suspended,Cancelled
+
+CREATE TABLE "appuser" (
+	"appuserid" SERIAL,
+	"appusername" VARCHAR(100) NULL DEFAULT NULL,
+	"isactive" INTEGER NULL DEFAULT NULL,
+	"password" VARCHAR(30) NULL DEFAULT NULL,
+	"isallowed" INTEGER NULL DEFAULT NULL,
+	"createdby" INTEGER NULL DEFAULT NULL,
+	"rowversion" INTEGER NULL DEFAULT NULL,
+	"updatedby" INTEGER NULL DEFAULT NULL,
+	"createddate" TIMESTAMP NULL DEFAULT NULL,
+	"updateddate" TIMESTAMP NULL DEFAULT NULL,
+	"plmn" VARCHAR(6) NULL DEFAULT NULL
+)
+
+CREATE TABLE "dnn" (
+	"dnnid" SERIAL,
+	"dnname" VARCHAR(50) NULL DEFAULT NULL,
+	"supportedpdusessiontype" INTEGER NULL DEFAULT NULL,
+	"allowedpdusessiontype" INTEGER NULL DEFAULT NULL,
+	"supportedsscmode1" INTEGER NULL DEFAULT NULL,
+	"allowedsscmode1" INTEGER NULL DEFAULT NULL,
+	"supportedsscmode2" INTEGER NULL DEFAULT NULL,
+	"allowedsscmode2" INTEGER NULL DEFAULT NULL,
+	"supportedsscmode3" INTEGER NULL DEFAULT NULL,
+	"allowedsscmode3" INTEGER NULL DEFAULT NULL,
+	"qosprofileprioritylevel" INTEGER NULL DEFAULT NULL,
+	"qosprofile5qi" INTEGER NULL DEFAULT NULL,
+	"qosprofilearpprioritylevel" INTEGER NULL DEFAULT NULL,
+	"qosprofilearppreemptcap" INTEGER NULL DEFAULT NULL,
+	"qosprofilearppreemptvuln" INTEGER NULL DEFAULT NULL,
+	"uplink" BIGINT NULL DEFAULT NULL,
+	"downlink" BIGINT NULL DEFAULT NULL,
+	"isactive" INTEGER NULL DEFAULT NULL,
+	"plmn" VARCHAR NULL DEFAULT NULL
+)
+
+CREATE TABLE "fsubscriber" (
+	"subscriberid" SERIAL,
+	"imsi" BIGINT NULL DEFAULT NULL,
+	"plmn" VARCHAR(6) NULL DEFAULT NULL,
+	"skey" VARCHAR(32) NULL DEFAULT NULL,
+	"opc" VARCHAR(32) NULL DEFAULT NULL,
+	"amf" VARCHAR(4) NULL DEFAULT NULL,
+	"seq" BIGINT NULL DEFAULT NULL,
+	"accountstatus" INTEGER NULL DEFAULT NULL,
+	"defsst" INTEGER NULL DEFAULT NULL,
+	"defsd" VARCHAR(6) NULL DEFAULT NULL,
+	"uplink" BIGINT NULL DEFAULT NULL,
+	"downlink" BIGINT NULL DEFAULT NULL,
+	"dnnid1" INTEGER NULL DEFAULT NULL,
+	"dnnid2" INTEGER NULL DEFAULT NULL,
+	"dnnid3" INTEGER NULL DEFAULT NULL,
+	"createddate" TIMESTAMP NULL DEFAULT NULL,
+	"updateddate" TIMESTAMP NULL DEFAULT NULL,
+	"createdby" INTEGER NULL DEFAULT NULL,
+	"updatedby" INTEGER NULL DEFAULT NULL,
+	"isactive" INTEGER NULL DEFAULT NULL,
+	"rowversion" INTEGER NULL DEFAULT NULL,
+	"msisdn" VARCHAR(20) NULL DEFAULT NULL,
+	UNIQUE INDEX "fsubscriber_imsi" ("imsi")
+)
+
+

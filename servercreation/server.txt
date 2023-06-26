@@ -1,0 +1,58 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+)
+
+func main() {
+	// We create the instance for Gin
+	r := gin.Default()
+
+	// Path to the static files. /static is rendered in the HTML and /media is the link to the path to the  images, svg, css.. the static files
+	r.StaticFS("/static", http.Dir("../media"))
+
+	// Path to the HTML templates. * is a wildcard
+	r.LoadHTMLGlob("*.html")
+
+	r.NoRoute(renderHome)
+	// This get executed when the users gets into our website in the home domain ("/")
+	r.GET("/", renderHome)
+	r.POST("/", getData)
+	r.Run(":8080")
+}
+
+func renderHome(c *gin.Context) {
+	c.HTML(http.StatusOK, "my-html.html", gin.H{})
+}
+
+func getData(c *gin.Context) {
+	formData := &struct {
+		Name string `json:"mydata"  binding:"required" `
+	}{}
+	// Validation (with Gin)
+	if err := c.Bind(formData); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Print(err)
+		return
+	}
+	fmt.Println("formData: ", formData.Name)
+
+	dec := json.NewDecoder(c.Request.Body)
+	fmt.Println("Decooder: ", dec)
+
+	dec.Decode(formData)
+	fmt.Println("formData: ", formData.Name)
+
+	p := c.PostForm("mydata")
+	fmt.Println("Params: ", p)
+	p = c.Params.ByName("mydata")
+	fmt.Println("Params: ", p)
+	p, _ = c.Params.Get("mydata")
+	fmt.Println("Get: ", p)
+
+	fmt.Println("Body: ", c.Request.Body)
+}

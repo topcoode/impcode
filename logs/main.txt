@@ -1,0 +1,9 @@
+frist create the text file "file.txt" 
+To open and read the file 
+frist open : To open that file create a go file and txt the code 
+file,err := os.open("file.txt")
+if err := nil{
+log.fatal(err)
+}
+*once we open the file ,we can read the data of file into a slice a bytes.
+*we can do this using the read method
